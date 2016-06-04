@@ -30,7 +30,6 @@ class DataBase(dict):
         super(DataBase,self).__setitem__(key,val)
         
     def save(self):
-        print(self)
         self.getConnection().insert_one(self)
         
         

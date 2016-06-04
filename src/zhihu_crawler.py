@@ -11,8 +11,8 @@ from bs4 import BeautifulSoup
 import re
 import math,time
 from bson.objectid import ObjectId
-from src.logger import Flogger,Slogger 
-from src.Model import ZhihuTask,ZhihuQA
+from logger import Flogger,Slogger 
+from Model import ZhihuTask,ZhihuQA
 
 
 
