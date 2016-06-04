@@ -109,6 +109,7 @@ def get_questions_list(start_page,max_page,topic_id=TOPIC_ID, sleep_sec=5, max_t
 def get_question(task_dict):
     try:
         url = task_dict['url']
+        question_id = int(url[31:])
         response = requests.get(url, headers=defalut_headers, timeout=60)
         if response.status_code == 404:
             return None
