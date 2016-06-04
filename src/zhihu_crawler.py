@@ -11,8 +11,8 @@ from bs4 import BeautifulSoup
 import re
 import math,time
 from bson.objectid import ObjectId
-from logger import Flogger,Slogger 
-from Model import ZhihuTask,ZhihuQA
+from src.logger import Flogger,Slogger 
+from src.Model import ZhihuTask,ZhihuQA
 
 
 
@@ -79,7 +79,7 @@ def get_questions_list(start_page,max_page,topic_id=TOPIC_ID, sleep_sec=5, max_t
                 '''
                 需要添加功能：将question存入任务队列，并输出success到任务队列success log
                 '''
-                print(question)#debug
+#                 print(question)#debug
                 ZhihuTask(question).save()
                 Slogger.info("GET TASK SUCCESS:{}".format(question['question']))
             return True
@@ -101,7 +101,7 @@ def get_questions_list(start_page,max_page,topic_id=TOPIC_ID, sleep_sec=5, max_t
             修改: 将url 打印到任务fail log
             '''
             Flogger.info("GET TASK-LIST FAILED:{}".format(url))
-            print('error occurs in get_questions_list!')
+#             print('error occurs in get_questions_list!')
             break
         cur_page += 1
         time.sleep(sleep_sec)
@@ -151,7 +151,7 @@ def get_question(task_dict):
                         '{"url_token": %d, "pagesize": 50, "offset": %d}' % (question_id, i*50)}
                     r = requests.post('http://www.zhihu.com/node/QuestionAnswerListV2',
                         headers=headers, data=data, timeout=60)
-                    print(r.url)
+#                     print(r.url)
                     for block in r.json()['msg']:
                         div = BeautifulSoup(block, 'lxml').div
                         if div.find('div', class_='answer-status') is not None:
@@ -160,7 +160,7 @@ def get_question(task_dict):
                         if len(answer) <= ANSWER_MAX_LEN:
                             answers.append(answer)
         question['answer_list'] = answers
-        print(question)
+#         print(question)
         
         '''
         需要添加功能：将question存入结果数据库，并更新task的IsExeted字段为True;在结果log中打印success
