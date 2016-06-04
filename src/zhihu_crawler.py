@@ -15,9 +15,6 @@ from logger import Flogger,Slogger
 from Model import ZhihuTask,ZhihuQA
 
 
-#demo 
-Slogger.info("crawl success")
-Flogger.info("crawl failed")
 
 defalut_headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36",
@@ -54,7 +51,7 @@ def get_login_session():
         print('登录成功！')
     return session
 
-def get_questions_list(topic_id, max_page,start_page=1, sleep_sec=5, max_try=3):
+def get_questions_list(start_page,max_page,topic_id=TOPIC_ID, sleep_sec=5, max_try=3):
     '''
         按照时间倒序获取某话题下的问题列表
         爬取的属性：ID，标题，来自的子话题，答案
@@ -181,4 +178,4 @@ def get_question(task_dict):
 if __name__=="__main__":
 #     get_login_session()
 #     get_question({'url': 'http://www.zhihu.com/question/47086984', 'question': '如何提高普通人的艺术修养，尤其是美术、音乐、时装之类的？电视里播的欣赏不了啊！', 'topic': '生活、艺术、文化与活动', 'extra_data': {}, 'isExec': False})
-    get_questions_list(TOPIC_ID,10)
+    get_questions_list(1,193820)
