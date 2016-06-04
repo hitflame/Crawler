@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 Created on Fri Jun 03 16:23:33 2016
 
@@ -11,8 +12,8 @@ from bs4 import BeautifulSoup
 import re
 import math,time
 from bson.objectid import ObjectId
-from logger import Flogger,Slogger 
-from Model import ZhihuTask,ZhihuQA
+from logger import Flogger,Slogger
+from Model import ZhihuTask,ZhihuQA,Seeds
 
 
 
@@ -51,7 +52,7 @@ def get_login_session():
         print('登录成功！')
     return session
 
-def get_questions_list(start_page,max_page,topic_id=TOPIC_ID, sleep_sec=5, max_try=3):
+def get_questions_list(task, sleep_sec=5, max_try=3):
     '''
         按照时间倒序获取某话题下的问题列表
         爬取的属性：ID，标题，来自的子话题，答案
@@ -59,9 +60,9 @@ def get_questions_list(start_page,max_page,topic_id=TOPIC_ID, sleep_sec=5, max_t
         2016年2月26日恢复了23日上线时去掉的「全部问题」列表
         参见 https://www.zhihu.com/question/40470324
     '''
-    def _get_each_question(page):
+    def _get_each_question(task):
         try:
-            url = 'http://www.zhihu.com/topic/%d/questions?page=%d' % (topic_id, page)
+            url = task['url']
             html = requests.get(url, headers=defalut_headers, timeout=60).text
             soup = BeautifulSoup(html, 'lxml')
             for div in soup.find_all('div', attrs={'itemprop': 'question'}):
@@ -81,34 +82,33 @@ def get_questions_list(start_page,max_page,topic_id=TOPIC_ID, sleep_sec=5, max_t
                 '''
 #                 print(question)#debug
                 ZhihuTask(question).save()
+                Seeds().getConnection().update({'_id':ObjectId(task['_id'])},{'$set':{'isExec':True}},False)
                 Slogger.info("GET TASK SUCCESS:{}".format(question['question']))
             return True
         except Exception:
             return False
-
-    cur_page = start_page
-    while cur_page < start_page + max_page:
-        try_count = 0
-        while not _get_each_question(cur_page):
-            if try_count > max_try:
-                break
-            else:
-                try_count += 1
-            time.sleep(sleep_sec)
+    
+    try_count = 0
+    while not _get_each_question(task):
         if try_count > max_try:
-            url = 'http://www.zhihu.com/topic/%d/questions?page=%d' % (topic_id, cur_page)
-            '''
-            修改: 将url 打印到任务fail log
-            '''
-            Flogger.info("GET TASK-LIST FAILED:{}".format(url))
-#             print('error occurs in get_questions_list!')
             break
-        cur_page += 1
+        else:
+            try_count += 1
         time.sleep(sleep_sec)
+    if try_count > max_try:
+        url = task['url']
+        '''
+        修改: 将url 打印到任务fail log
+        '''
+        Flogger.info("GET TASK-LIST FAILED:{}".format(url))
+#             print('error occurs in get_questions_list!')
+    time.sleep(sleep_sec)
+
 
 def get_question(task_dict):
     try:
         url = task_dict['url']
+        question_id = int(url[31:])
         response = requests.get(url, headers=defalut_headers, timeout=60)
         if response.status_code == 404:
             return None
@@ -178,4 +178,6 @@ def get_question(task_dict):
 if __name__=="__main__":
 #     get_login_session()
 #     get_question({'url': 'http://www.zhihu.com/question/47086984', 'question': '如何提高普通人的艺术修养，尤其是美术、音乐、时装之类的？电视里播的欣赏不了啊！', 'topic': '生活、艺术、文化与活动', 'extra_data': {}, 'isExec': False})
-    get_questions_list(1,193820)
+    pass
+
+            

@@ -5,8 +5,6 @@ from pymongo import MongoClient
 MONGO_HOST = '100.81.181.119'
 MONGO_PORT = 27017
 
-
-
 DB_CONNECTION = {}
 
 class DataBase(dict):
@@ -31,6 +29,10 @@ class DataBase(dict):
         
     def save(self):
         self.getConnection().insert_one(self)
+        
+
+class Seeds(DataBase):
+    field = ["url","isExec"]
         
         
 class ZhihuTask(DataBase):
