@@ -19,7 +19,7 @@ class Worker(object):
         while True:
             #随机取一个任务
             task = self._work_source().getConnection().find({'isExec': False}).limit(1000).skip(random.randint(1,998)).limit(1).next() 
-            print(task)
+#             print(task)
             if task:
                 self._worker_method(task)
                 time.sleep(3)

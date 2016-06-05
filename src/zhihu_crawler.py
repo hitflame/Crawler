@@ -48,10 +48,10 @@ def get_login_session():
         print('登录成功！')
     return session
 
-session = SESSION.get("session")
-if not session:
-    SESSION['session'] = get_login_session()
-session = SESSION['session']
+# session = SESSION.get("session")
+# if not session:
+#     SESSION['session'] = get_login_session()
+# session = SESSION['session']
 
 
 def get_questions_list(task, sleep_sec=5, max_try=3):
@@ -65,7 +65,7 @@ def get_questions_list(task, sleep_sec=5, max_try=3):
     def _get_each_question(task):
         try:
             url = task['url']
-            html = session.get(url, headers=defalut_headers, timeout=60).text
+            html = requests.get(url, headers=defalut_headers, timeout=60).text
             soup = BeautifulSoup(html, 'lxml')
             for div in soup.find_all('div', attrs={'itemprop': 'question'}):
                 question = {}
@@ -111,8 +111,8 @@ def get_question(task_dict):
     try:
         url = task_dict['url']
         question_id = int(url.split('/')[-1])
-        print("question_id:",question_id)
-        response = session.get(url, headers=defalut_headers, timeout=60)
+#         print("question_id:",question_id)
+        response = requests.get(url, headers=defalut_headers, timeout=60)
         if response.status_code == 404:
             return None
         soup = BeautifulSoup(response.text, 'lxml')
@@ -120,6 +120,7 @@ def get_question(task_dict):
         question = {}
         question['question'] = task_dict['question']
         question['topic'] = task_dict['topic']
+        question["question_id"] = question_id
         block = soup.find('div', id='zh-question-detail')
         def _extract_answer(block):
             answer = block.find('div', class_='zm-editable-content').text.strip()
@@ -152,7 +153,7 @@ def get_question(task_dict):
                 for i in range(1, int(math.ceil(answers_count/50))):  # more answers
                     data = {"_xsrf": _xsrf, "method": 'next', 'params':
                         '{"url_token": %d, "pagesize": 50, "offset": %d}' % (question_id, i*50)}
-                    r = session.post('http://www.zhihu.com/node/QuestionAnswerListV2',
+                    r = requests.post('http://www.zhihu.com/node/QuestionAnswerListV2',
                         headers=headers, data=data, timeout=60)
 #                     print(r.url)
                     for block in r.json()['msg']:
@@ -163,7 +164,7 @@ def get_question(task_dict):
                         if len(answer) <= ANSWER_MAX_LEN:
                             answers.append(answer)
         question['answer_list'] = answers
-        print(question)
+#         print(question)
         
         '''
         需要添加功能：将question存入结果数据库，并更新task的IsExeted字段为True;在结果log中打印success

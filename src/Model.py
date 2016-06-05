@@ -44,7 +44,8 @@ class ZhihuTask(DataBase):
     
     
 class ZhihuQA(DataBase):
-    field = ["question",    #question of the post
+    field = ["question", #question of the post
+             "question_id",   
              'topic',       #question area
              'answer_list', #replies for the question
              "extra_data"]  #some extra data may be used in crawler
