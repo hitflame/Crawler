@@ -1,11 +1,4 @@
 # -*- coding: utf-8 -*-
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Jun 03 16:23:33 2016
-
-@author: wenqiang.zwq
-"""
-
 import requests
 import json
 from bs4 import BeautifulSoup
