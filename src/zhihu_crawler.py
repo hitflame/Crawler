@@ -22,6 +22,7 @@ TOPIC_ID = 19776749   #根话题topic id
 知乎登录：可以修改config.json的账号信息，爬虫测试过可以不用登录
 '''
 
+SESSION = {}
 
 def get_login_session():
     with open('../config.json') as f:
@@ -47,8 +48,11 @@ def get_login_session():
         print('登录成功！')
     return session
 
+session = SESSION.get("session")
+if not session:
+    SESSION['session'] = get_login_session()
+session = SESSION['session']
 
-session = get_login_session()
 
 def get_questions_list(task, sleep_sec=5, max_try=3):
     '''

@@ -4,6 +4,7 @@ from Model import ZhihuTask,ZhihuQA,Seeds
 from zhihu_crawler import get_questions_list,get_question
 import concurrent.futures
 from logger import Flogger,Slogger 
+import random
 
 
 
@@ -16,14 +17,15 @@ class Worker(object):
         
     def work(self):
         while True:
-            task = self._work_source().getConnection().find_one({'isExec': False}) #根据条件查询posts中数据
+            #随机取一个任务
+            task = self._work_source().getConnection().find({'isExec': False}).limit(1000).skip(random.randint(1,998)).limit(1).next() 
             print(task)
             if task:
                 self._worker_method(task)
-                time.sleep(5)
+                time.sleep(3)
             else:
                 Slogger.info("NO WORK TO DO,SLEEP...")
-                time.sleep(60)
+                time.sleep(10)
         
 
 
@@ -54,5 +56,3 @@ if __name__=="__main__":
 #     CreateWorker()
 #     listWorker.work()
     taskWorker.work()
-#     taskCreateWorker()   
-#     taskExecWorker()  
