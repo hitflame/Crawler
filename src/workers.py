@@ -17,7 +17,7 @@ class Worker(object):
     def work(self):
         while True:
             task = self._work_source().getConnection().find_one({'isExec': False}) #根据条件查询posts中数据
-#             print(task)
+            print(task)
             if task:
                 self._worker_method(task)
                 time.sleep(5)
@@ -52,7 +52,7 @@ def CreateWorker():
         
 if __name__=="__main__":  
 #     CreateWorker()
-    listWorker.work()
-#     taskWorker.work()
+#     listWorker.work()
+    taskWorker.work()
 #     taskCreateWorker()   
 #     taskExecWorker()  

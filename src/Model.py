@@ -52,4 +52,4 @@ class ZhihuQA(DataBase):
     
 if __name__=="__main__":
     ZhihuQA({'question':1,'topic':2,'answer_list':3}).save()
-    ZhihuTask({'question':1,'topic':2,'url':3,'isExec':4}).save()
+#     ZhihuTask({'question':1,'topic':2,'url':3,'isExec':4}).save()

@@ -21,6 +21,8 @@ TOPIC_ID = 19776749   #根话题topic id
 '''
 知乎登录：可以修改config.json的账号信息，爬虫测试过可以不用登录
 '''
+
+
 def get_login_session():
     with open('../config.json') as f:
         config = json.load(f)
@@ -45,6 +47,9 @@ def get_login_session():
         print('登录成功！')
     return session
 
+
+session = get_login_session()
+
 def get_questions_list(task, sleep_sec=5, max_try=3):
     '''
         按照时间倒序获取某话题下的问题列表
@@ -56,7 +61,7 @@ def get_questions_list(task, sleep_sec=5, max_try=3):
     def _get_each_question(task):
         try:
             url = task['url']
-            html = requests.get(url, headers=defalut_headers, timeout=60).text
+            html = session.get(url, headers=defalut_headers, timeout=60).text
             soup = BeautifulSoup(html, 'lxml')
             for div in soup.find_all('div', attrs={'itemprop': 'question'}):
                 question = {}
@@ -101,8 +106,9 @@ def get_questions_list(task, sleep_sec=5, max_try=3):
 def get_question(task_dict):
     try:
         url = task_dict['url']
-        question_id = int(url[31:])
-        response = requests.get(url, headers=defalut_headers, timeout=60)
+        question_id = int(url.split('/')[-1])
+        print("question_id:",question_id)
+        response = session.get(url, headers=defalut_headers, timeout=60)
         if response.status_code == 404:
             return None
         soup = BeautifulSoup(response.text, 'lxml')
@@ -142,7 +148,7 @@ def get_question(task_dict):
                 for i in range(1, int(math.ceil(answers_count/50))):  # more answers
                     data = {"_xsrf": _xsrf, "method": 'next', 'params':
                         '{"url_token": %d, "pagesize": 50, "offset": %d}' % (question_id, i*50)}
-                    r = requests.post('http://www.zhihu.com/node/QuestionAnswerListV2',
+                    r = session.post('http://www.zhihu.com/node/QuestionAnswerListV2',
                         headers=headers, data=data, timeout=60)
 #                     print(r.url)
                     for block in r.json()['msg']:
@@ -153,7 +159,7 @@ def get_question(task_dict):
                         if len(answer) <= ANSWER_MAX_LEN:
                             answers.append(answer)
         question['answer_list'] = answers
-#         print(question)
+        print(question)
         
         '''
         需要添加功能：将question存入结果数据库，并更新task的IsExeted字段为True;在结果log中打印success
