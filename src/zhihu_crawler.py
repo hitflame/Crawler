@@ -165,7 +165,7 @@ def get_question(task_dict):
         '''
         需要添加功能：将question存入结果数据库，并更新task的IsExeted字段为True;在结果log中打印success
         '''
-        ZhihuTask(question).save()
+        ZhihuQA(question).save()
         ZhihuTask().getConnection().update({'_id':ObjectId(task_dict['_id'])},{'$set':{'isExec':True}},False)
         Slogger.info("EXECUTE TASK SUCCESS:{}".format(url))
     except Exception:
