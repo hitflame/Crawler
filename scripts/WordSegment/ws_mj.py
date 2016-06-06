@@ -18,13 +18,16 @@ def handle(inputFile,outputFile):
 				q,a = line.strip().split('\t')
 				if q=="" or a=="":
 					continue
-				cut_q,cut_a = os.popen(CMD.format(q)).read(),os.popen(CMD.format(a)).read()
-				write_str.append(cut_q.strip()+"\t"+cut_a.strip()+"\n")
+				cut_q,cut_a = os.popen(CMD.format(q)).read().strip(),os.popen(CMD.format(a)).read().strip()
+				if cut_q="" or cut_a="":
+					continue
+				write_str.append(cut_q+"\t"+cut_a+"\n")
 			except:
 				continue
 	open(outputFile,"w+",encoding='utf-8').writelines(write_str)
 
 
 if __name__ == "__main__":
-	handle(*sys.argv[1:3])
+	inputFile,outputFile = sys.argv[1:3]
+	handle(inputFile,outputFile)
     
