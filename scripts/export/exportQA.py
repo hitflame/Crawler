@@ -7,16 +7,21 @@ import random
 def exportQA():
     write_list= []
     for x in ZhihuQA().getConnection().find({}):
-        question = x['question']
-        answers = x['answer_list']
-        if len(question)>20:
+        try:
+            question = x['question']
+            answers = x['answer_list']
+#             print(question)
+#             if len(question)>20:
+#                 continue
+            for  answer in answers:
+                if len(answer)<4 or len(answer)>20:
+                    continue
+                c = question+u'\t'+answer+u"\n"
+                write_list.append(c)
+        except:
             continue
-        for  answer in answers:
-            if len(answer)>20:
-                continue
-            c = question+u'\t'+answer+u"\n"
-            write_list.append(c)
-    with open(r'Zhihu_all.txt','a+',encoding='utf-8') as f:
+    print(len(write_list))
+    with open(r'C:\Users\guoqingpei\Zhihu_all.txt','w+',encoding='utf-8') as f:
         f.writelines(write_list)
 
     
@@ -38,5 +43,5 @@ def shuffleQA():
 
 if __name__=="__main__":
 #     exportA()
-#     exportQA()
-    exportQ()
+    exportQA()
+#     exportQ()

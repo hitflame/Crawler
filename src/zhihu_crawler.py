@@ -7,7 +7,7 @@ import math,time
 from bson.objectid import ObjectId
 from logger import Flogger,Slogger
 from Model import ZhihuTask,ZhihuQA,Seeds
-
+import random
 
 
 defalut_headers = {
@@ -18,10 +18,12 @@ defalut_headers = {
 ANSWER_MAX_LEN = 200  #回答长度限制
 TOPIC_ID = 19776749   #根话题topic id
 
+AGENT_LIST =[line.strip() for line in  open(r"../agentlist",encoding='utf-8')]
 '''
 知乎登录：可以修改config.json的账号信息，爬虫测试过可以不用登录
 '''
 
+print(AGENT_LIST)
 SESSION = {}
 
 def get_login_session():
@@ -65,6 +67,7 @@ def get_questions_list(task, sleep_sec=5, max_try=3):
     def _get_each_question(task):
         try:
             url = task['url']
+            defalut_headers["User-Agent"] = random.choice(AGENT_LIST)
             html = requests.get(url, headers=defalut_headers, timeout=60).text
             soup = BeautifulSoup(html, 'lxml')
             for div in soup.find_all('div', attrs={'itemprop': 'question'}):
@@ -72,6 +75,10 @@ def get_questions_list(task, sleep_sec=5, max_try=3):
                 a = div.find('a', class_='question_link')
                 question['url'] = 'http://www.zhihu.com' + a['href']
                 question['question'] = a.text.strip()
+                if int(div.find('meta', attrs={'itemprop': 'answerCount'})['content']) > 0:
+                    question['isExec'] = False
+                else:
+                    question['isExec'] = True
                 question['isExec'] = False
                 subtopic = div.find('div', class_='subtopic')
                 if subtopic:
@@ -112,6 +119,8 @@ def get_question(task_dict):
         url = task_dict['url']
         question_id = int(url.split('/')[-1])
 #         print("question_id:",question_id)
+        
+        defalut_headers["User-Agent"] = random.choice(AGENT_LIST)
         response = requests.get(url, headers=defalut_headers, timeout=60)
         if response.status_code == 404:
             return None
@@ -150,6 +159,7 @@ def get_question(task_dict):
                 _xsrf = xsrf_tag['value']
                 headers = dict(defalut_headers)
                 headers['Referer'] = url
+                headers["User-Agent"] = random.choice(AGENT_LIST)
                 for i in range(1, int(math.ceil(answers_count/50))):  # more answers
                     data = {"_xsrf": _xsrf, "method": 'next', 'params':
                         '{"url_token": %d, "pagesize": 50, "offset": %d}' % (question_id, i*50)}

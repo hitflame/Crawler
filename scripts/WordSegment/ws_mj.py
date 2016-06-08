@@ -19,7 +19,7 @@ def handle(inputFile,outputFile):
 				if q=="" or a=="":
 					continue
 				cut_q,cut_a = os.popen(CMD.format(q)).read().strip(),os.popen(CMD.format(a)).read().strip()
-				if cut_q="" or cut_a="":
+				if cut_q=="" or cut_a=="":
 					continue
 				write_str.append(cut_q+"\t"+cut_a+"\n")
 			except:
@@ -30,4 +30,3 @@ def handle(inputFile,outputFile):
 if __name__ == "__main__":
 	inputFile,outputFile = sys.argv[1:3]
 	handle(inputFile,outputFile)
-    

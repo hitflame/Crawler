@@ -22,7 +22,7 @@ class Worker(object):
 #             print(task)
             if task:
                 self._worker_method(task)
-                time.sleep(3)
+                time.sleep(random.randint(1,10))
             else:
                 Slogger.info("NO WORK TO DO,SLEEP...")
                 time.sleep(10)
