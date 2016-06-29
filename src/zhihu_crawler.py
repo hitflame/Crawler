@@ -8,6 +8,7 @@ from bson.objectid import ObjectId
 from logger import Flogger,Slogger
 from Model import ZhihuTask,ZhihuQA,Seeds
 import random
+import datetime
 
 
 defalut_headers = {
@@ -130,6 +131,7 @@ def get_question(task_dict):
         question['question'] = task_dict['question']
         question['topic'] = task_dict['topic']
         question["question_id"] = question_id
+        question['date'] = datetime.datetime.utcfromtimestamp(int(div.find('span', class_='time')['data-timestamp']) // 1000).isoformat()
         block = soup.find('div', id='zh-question-detail')
         def _extract_answer(block):
             answer = block.find('div', class_='zm-editable-content').text.strip()
@@ -179,7 +181,7 @@ def get_question(task_dict):
         '''
         需要添加功能：将question存入结果数据库，并更新task的IsExeted字段为True;在结果log中打印success
         '''
-        ZhihuQA(question).save()
+        ZhihuQANew(question).save()
         ZhihuTask().getConnection().update({'_id':ObjectId(task_dict['_id'])},{'$set':{'isExec':True}},False)
         Slogger.info("EXECUTE TASK SUCCESS:{}".format(url))
     except Exception:
