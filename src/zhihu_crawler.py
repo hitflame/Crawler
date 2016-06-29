@@ -76,6 +76,7 @@ def get_questions_list(task, sleep_sec=5, max_try=3):
                 a = div.find('a', class_='question_link')
                 question['url'] = 'http://www.zhihu.com' + a['href']
                 question['question'] = a.text.strip()
+                question['date'] = datetime.datetime.utcfromtimestamp(int(div.find('span', class_='time')['data-timestamp']) // 1000).isoformat()
                 if int(div.find('meta', attrs={'itemprop': 'answerCount'})['content']) > 0:
                     question['isExec'] = False
                 else:
@@ -131,7 +132,6 @@ def get_question(task_dict):
         question['question'] = task_dict['question']
         question['topic'] = task_dict['topic']
         question["question_id"] = question_id
-        question['date'] = datetime.datetime.utcfromtimestamp(int(div.find('span', class_='time')['data-timestamp']) // 1000).isoformat()
         block = soup.find('div', id='zh-question-detail')
         def _extract_answer(block):
             answer = block.find('div', class_='zm-editable-content').text.strip()
