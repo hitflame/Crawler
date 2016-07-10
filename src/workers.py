@@ -1,12 +1,10 @@
 #coding=utf-8
 import time,threading
-from Model import ZhihuTask,ZhihuQA,Seeds
-from zhihu_crawler import get_questions_list,get_question
+from Model import XiangrikuiQuestionList,XiangrikuiQuestionPage,XiangrikuiSeeds
+from xiangrikui_crawler import get_question_list,get_question_page
 import concurrent.futures
-from logger import Flogger,Slogger 
+from logger import Slogger 
 import random
-
-
 
 
 class Worker(object):
@@ -18,7 +16,8 @@ class Worker(object):
     def work(self):
         while True:
             #随机取一个任务
-            task = self._work_source().getConnection().find({'isExec': False}).limit(1000).skip(random.randint(1,998)).limit(1).next() 
+            find_interator = self._work_source().getConnection().find({'isExec': False})
+            task = find_interator.limit(-1).skip(random.randint(0,find_interator.count()-1)).next() 
 #             print(task)
             if task:
                 self._worker_method(task)
@@ -35,20 +34,18 @@ class ListExecWorker(Worker):
 class TaskExecWorker(Worker):
     pass
 
-taskWorker = TaskExecWorker(get_question,ZhihuTask)
-listWorker = ListExecWorker(get_questions_list,Seeds)
-
-
+taskWorker = TaskExecWorker(get_question_page,XiangrikuiQuestionList)
+listWorker = ListExecWorker(get_question_list,XiangrikuiSeeds)
 
 "https://www.zhihu.com/topic/19776749/questions?page=2"
 
 def CreateWorker():
-    for page in range(1,193823):#193823
-        Seeds({
-               'url':"https://www.zhihu.com/topic/19776749/questions?page="+str(page),
+    for page in range(1,20502):#20502
+        XiangrikuiSeeds({
+               'url':"http://wenba.xiangrikui.com/wenda/"+str(page)+".html",
                'isExec':False
                }).save()
-        print(page)
+#        print(page)
  
         
         
